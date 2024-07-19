@@ -51,11 +51,11 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         }
     }
 
-    // thorn
+    // bat
     int BatX = boardWidth;
-    int BatY = -150;
-    int BatWidth = 300;
-    int BatHeight = 350;
+    int BatY = -50;
+    int BatWidth = 200;
+    int BatHeight = 250;
 
     class Bat {
         int x = BatX;
@@ -201,16 +201,16 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         }
     }
 
+    // collision to the tree trunk
     public boolean trunkCollision(Molla molla, Trunk trunk) {
-        return molla.x < trunk.width + trunk.x && molla.x + molla.width > trunk.x
-                && molla.y < trunk.height + trunk.y && molla.y + molla.height > trunk.y;
-
+        return molla.x + 10 < trunk.width + trunk.x && molla.x + molla.width - 30 > trunk.x
+                && molla.y + 10 < trunk.height + trunk.y && molla.y + molla.height > trunk.y + 10;
     }
 
+    // collision to the bat
     public boolean batCollision(Molla molla, Bat bat) {
-        return molla.x - 60 < bat.width + bat.x && molla.x + molla.width - 60 > bat.x
+        return molla.x + 80 < bat.width + bat.x && molla.x + molla.width - 100 > bat.x
                 && molla.y < bat.y + bat.height - 100 && molla.y + molla.height > bat.y - 50;
-
     }
 
     @Override
@@ -221,26 +221,9 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
             placeTrnukTimer.stop();
             placeBatTimer.stop();
             gameLoop.stop();
-
-        }
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            velocityY = -10;
-        } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            molla.y += 6;
-        } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            molla.x += 12;
-            molla.x = Math.min(molla.x, 900);
-        } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            molla.x -= 12;
-        }
-
-        // restart the game
-        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            if (gameOver) {
+            int response = JOptionPane.showConfirmDialog(null, "Score :  \nPlay Again?", "Ooops 🙄. Game Over!!!!!!!", JOptionPane.YES_NO_OPTION);
+            if (response == JOptionPane.YES_OPTION) {
+                // User clicked YES
                 molla.y = mollaY;
                 molla.x = mollaX;
                 trunks.clear();
@@ -250,7 +233,47 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
                 placeBatTimer.start();
                 placeTrnukTimer.start();
             }
+            else{
+                System.exit(0);
+            }
+
+
         }
+    }
+
+    int tapCount = 0;
+    boolean tap3 = true;
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if ((e.getKeyCode() == KeyEvent.VK_SPACE) && tap3) {
+            velocityY = -20; // up
+            tapCount++;
+            if (tapCount == 3) {
+                tap3 = false;
+                tapCount = 0;
+            }
+        }
+        if (molla.y >= 430) {
+            tap3 = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            molla.y += 6; // down
+        }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            molla.x += 12; // right
+            molla.x = Math.min(molla.x, 900);
+        }
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            molla.x -= 12; // left
+        }
+
+        // restart the game by pressing ENTER
+        // if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+        //     if (gameOver) {
+                
+        //     }
+        // }
     }
 
     @Override
