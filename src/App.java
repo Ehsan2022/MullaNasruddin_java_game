@@ -12,12 +12,12 @@ public class App {
         fream.setResizable(false);
         fream.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // MollaNasruddin mollaNasruddin = new MollaNasruddin();
-        // fream.add(mollaNasruddin);
+        MollaNasruddin mollaNasruddin = new MollaNasruddin();
+        fream.add(mollaNasruddin);
 
         // makes full screen up to header
         fream.pack();
-        // mollaNasruddin.requestFocus();
+        mollaNasruddin.requestFocus();
         fream.setVisible(true);
 
     }

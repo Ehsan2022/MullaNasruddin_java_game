@@ -11,8 +11,8 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     Image backgroungImg;
     Image mollaImg;
     Image thornLeftImg;
-    Image thornTopImg;
-    Image trunkImg1;
+    Image batImg;
+    Image trunkImg;
 
     // Molla
     int mollaX = 370;
@@ -35,7 +35,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     // trunk
     int trunkX = boardWidth;
     int trunkY = 600;
-    int trunkWidth = 150;
+    int trunkWidth = 100;
     int trunkHeight = 500;
 
     class Trunk {
@@ -97,11 +97,11 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         addKeyListener(this);
 
         // images
-        backgroungImg = new ImageIcon(getClass().getResource("img/bgdark.png")).getImage();
-        mollaImg = new ImageIcon(getClass().getResource("img/molllla.png")).getImage();
-        thornLeftImg = new ImageIcon(getClass().getResource("img/thorn.png")).getImage();
-        thornTopImg = new ImageIcon(getClass().getResource("img/bat.gif")).getImage();
-        trunkImg1 = new ImageIcon(getClass().getResource("img/b.png")).getImage();
+        backgroungImg = new ImageIcon(getClass().getResource("bgLight.png")).getImage();
+        mollaImg = new ImageIcon(getClass().getResource("molla2.png")).getImage();
+        thornLeftImg = new ImageIcon(getClass().getResource("thorn.png")).getImage();
+        batImg = new ImageIcon(getClass().getResource("bat.gif")).getImage();
+        trunkImg = new ImageIcon(getClass().getResource("trunk2.png")).getImage();
 
         // molla
         molla = new Molla(mollaImg);
@@ -135,7 +135,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     public void placeTrunk() {
         int randomTrunky = (int) (Math.random() * 100);
 
-        Trunk trunk = new Trunk(trunkImg1);
+        Trunk trunk = new Trunk(trunkImg);
         trunk.y -= randomTrunky;
         trunks.add(trunk);
 
@@ -144,7 +144,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     public void placeThorn() {
         int randomThorny = (int) (Math.random() * 150);
 
-        Thorn thorn = new Thorn(thornTopImg);
+        Thorn thorn = new Thorn(batImg);
         thorn.y += randomThorny;
         thorns.add(thorn);
     }
