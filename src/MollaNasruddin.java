@@ -97,11 +97,11 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         addKeyListener(this);
 
         // images
-        backgroungImg = new ImageIcon(getClass().getResource("bgdark.png")).getImage();
-        mollaImg = new ImageIcon(getClass().getResource("molllla.png")).getImage();
-        thornLeftImg = new ImageIcon(getClass().getResource("thorn.png")).getImage();
-        thornTopImg = new ImageIcon(getClass().getResource("bat.gif")).getImage();
-        trunkImg1 = new ImageIcon(getClass().getResource("b.png")).getImage();
+        backgroungImg = new ImageIcon(getClass().getResource("img/bgdark.png")).getImage();
+        mollaImg = new ImageIcon(getClass().getResource("img/molllla.png")).getImage();
+        thornLeftImg = new ImageIcon(getClass().getResource("img/thorn.png")).getImage();
+        thornTopImg = new ImageIcon(getClass().getResource("img/bat.gif")).getImage();
+        trunkImg1 = new ImageIcon(getClass().getResource("img/b.png")).getImage();
 
         // molla
         molla = new Molla(mollaImg);
