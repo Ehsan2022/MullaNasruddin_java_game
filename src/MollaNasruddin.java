@@ -6,7 +6,7 @@ import javax.swing.*;
 
 public class MollaNasruddin extends JPanel implements ActionListener, KeyListener {
     int boardWidth = 1400;
-    int boardHeight = 640;
+    int boardHeight = 670;
 
     Image backgroungImg;
     Image mollaImg;
@@ -17,8 +17,8 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     // Molla
     int mollaX = 370;
     int mollaY = 0;
-    int mollaWidth = 100;
-    int mollaHeight = 150;
+    int mollaWidth = 190;
+    int mollaHeight = 210;
 
     class Molla {
         int x = mollaX;
@@ -52,19 +52,19 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     }
 
     // thorn
-    int thornX = boardWidth;
-    int thornY = -150;
-    int thornWidth = 150;
-    int thornHeight = 350;
+    int BatX = boardWidth;
+    int BatY = -150;
+    int BatWidth = 300;
+    int BatHeight = 350;
 
-    class Thorn {
-        int x = thornX;
-        int y = thornY;
-        int width = thornWidth;
-        int height = thornHeight;
+    class Bat {
+        int x = BatX;
+        int y = BatY;
+        int width = BatWidth;
+        int height = BatHeight;
         Image img;
 
-        Thorn(Image img) {
+        Bat(Image img) {
             this.img = img;
         }
     }
@@ -73,17 +73,17 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     Molla molla;
 
     int trunkVelocityX = -4; // move trunk to the left
-    int ThornVelocityX = -7; // move trunk to the left
+    int BatVelocityX = -7; // move trunk to the left
     int velocityY = -10;
     int gravity = 1;
 
     ArrayList<Trunk> trunks;
-    ArrayList<Thorn> thorns;
+    ArrayList<Bat> bats;
     Random random = new Random();
 
     Timer gameLoop;
     Timer placeTrnukTimer;
-    Timer placeThornTimer;
+    Timer placeBatTimer;
 
     boolean gameOver = false;
     boolean flag = false;
@@ -98,7 +98,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
 
         // images
         backgroungImg = new ImageIcon(getClass().getResource("bgLight.png")).getImage();
-        mollaImg = new ImageIcon(getClass().getResource("molla2.png")).getImage();
+        mollaImg = new ImageIcon(getClass().getResource("mn.png")).getImage();
         thornLeftImg = new ImageIcon(getClass().getResource("thorn.png")).getImage();
         batImg = new ImageIcon(getClass().getResource("bat.gif")).getImage();
         trunkImg = new ImageIcon(getClass().getResource("trunk2.png")).getImage();
@@ -108,7 +108,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         // trunks
         trunks = new ArrayList<Trunk>();
         // thorn
-        thorns = new ArrayList<Thorn>();
+        bats = new ArrayList<Bat>();
 
         // place trunk timer
         placeTrnukTimer = new Timer(2000, new ActionListener() {
@@ -120,13 +120,13 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         placeTrnukTimer.start();
 
         // place thorn timer
-        placeThornTimer = new Timer(3000, new ActionListener() {
+        placeBatTimer = new Timer(3000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 placeThorn();
             }
         });
-        placeThornTimer.start();
+        placeBatTimer.start();
         // game timer
         gameLoop = new Timer(1000 / 70, this);
         gameLoop.start();
@@ -144,9 +144,9 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     public void placeThorn() {
         int randomThorny = (int) (Math.random() * 150);
 
-        Thorn thorn = new Thorn(batImg);
-        thorn.y += randomThorny;
-        thorns.add(thorn);
+        Bat bat = new Bat(batImg);
+        bat.y += randomThorny;
+        bats.add(bat);
     }
 
     // @Override
@@ -157,7 +157,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
 
     public void draw(Graphics g) {
         // background
-        g.drawImage(backgroungImg, 0, 0, boardWidth, 780, null);
+        g.drawImage(backgroungImg, 0, 0, boardWidth, 700, null);
         // thorn خار
         g.drawImage(thornLeftImg, -50, 0, 100, boardHeight + 500, null);
         g.drawImage(thornLeftImg, -30, 0, 100, boardHeight + 475, null);
@@ -169,9 +169,9 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
             g.drawImage(trunk.img, trunk.x, trunk.y, trunk.width, trunk.height, null);
         }
         // thorn
-        for (int i = 0; i < thorns.size(); i++) {
-            Thorn thorn = thorns.get(i);
-            g.drawImage(thorn.img, thorn.x, thorn.y, thorn.width, thorn.height, null);
+        for (int i = 0; i < bats.size(); i++) {
+            Bat bat = bats.get(i);
+            g.drawImage(bat.img, bat.x, bat.y, bat.width, bat.height, null);
         }
 
     }
@@ -181,18 +181,18 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         molla.y += velocityY;
 
         molla.y = Math.max(molla.y, 0);
-        molla.y = Math.min(molla.y, 480);
+        molla.y = Math.min(molla.y, 445);
 
         // trunk and thorn
-        for (int i = 0; i < (thorns.size()); i++) {
+        for (int i = 0; i < (bats.size()); i++) {
 
             Trunk trunk = trunks.get(i);
             trunk.x += trunkVelocityX;
 
-            Thorn thorn = thorns.get(i);
-            thorn.x += ThornVelocityX;
+            Bat bat = bats.get(i);
+            bat.x += BatVelocityX;
 
-            if (thornCollision(molla, thorn) || trunkCollision(molla, trunk)) {
+            if (batCollision(molla, bat) || trunkCollision(molla, trunk)) {
                 gameOver = true;
             }
         }
@@ -207,9 +207,9 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
 
     }
 
-    public boolean thornCollision(Molla molla, Thorn thorn) {
-        return molla.x - 60 < thorn.width + thorn.x && molla.x + molla.width - 60 > thorn.x
-                && molla.y < thorn.y + thorn.height - 100 && molla.y + molla.height > thorn.y - 50;
+    public boolean batCollision(Molla molla, Bat bat) {
+        return molla.x - 60 < bat.width + bat.x && molla.x + molla.width - 60 > bat.x
+                && molla.y < bat.y + bat.height - 100 && molla.y + molla.height > bat.y - 50;
 
     }
 
@@ -219,7 +219,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         repaint();
         if (gameOver) {
             placeTrnukTimer.stop();
-            placeThornTimer.stop();
+            placeBatTimer.stop();
             gameLoop.stop();
 
         }
@@ -229,17 +229,6 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             velocityY = -10;
-            if (gameOver) {
-                molla.y = mollaY;
-                molla.x = mollaX;
-                trunks.clear();
-                thorns.clear();
-                gameOver = false;
-                gameLoop.start();
-                placeThornTimer.start();
-                placeTrnukTimer.start();
-
-            }
         } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
             molla.y += 6;
         } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
@@ -247,6 +236,20 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
             molla.x = Math.min(molla.x, 900);
         } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             molla.x -= 12;
+        }
+
+        // restart the game
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (gameOver) {
+                molla.y = mollaY;
+                molla.x = mollaX;
+                trunks.clear();
+                bats.clear();
+                gameOver = false;
+                gameLoop.start();
+                placeBatTimer.start();
+                placeTrnukTimer.start();
+            }
         }
     }
 
