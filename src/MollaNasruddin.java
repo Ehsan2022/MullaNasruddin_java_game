@@ -125,29 +125,29 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         placeBatTimer = new Timer(3000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                placeThorn();
+                placeBat();
             }
         });
         placeBatTimer.start();
         // game timer
-        gameLoop = new Timer(1000 / 70, this);
+        gameLoop = new Timer(1000 / 80, this);
         gameLoop.start();
     }
 
     public void placeTrunk() {
-        int randomTrunky = (int) (Math.random() * 100) + 50;
+        int randomTrunkY = (int) (Math.random() * 100) + 50;
 
         Trunk trunk = new Trunk(trunkImg);
-        trunk.y -= randomTrunky;
+        trunk.y -= randomTrunkY;
         trunks.add(trunk);
 
     }
 
-    public void placeThorn() {
-        int randomThorny = (int) (Math.random() * 150);
+    public void placeBat() {
+        int randomBatY = (int) (Math.random() * 180 + 15);
 
         Bat bat = new Bat(batImg);
-        bat.y += randomThorny;
+        bat.y += randomBatY;
         bats.add(bat);
     }
 
@@ -246,7 +246,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
                 bestScore = score;
             }
             // change button text to farsi
-            UIManager.put("OptionPane.yesButtonText", "دوباره بازی میکنیم");
+            UIManager.put("OptionPane.yesButtonText", "دوباره بازی میکنم");
             UIManager.put("OptionPane.noButtonText", "بسه دیگه، مونده شدم");
             // for changing text direction to farsi
             JFrame frame = new JFrame();
