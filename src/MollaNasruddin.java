@@ -7,7 +7,6 @@ import javax.swing.*;
 public class MollaNasruddin extends JPanel implements ActionListener, KeyListener {
     int boardWidth = 1400;
     int boardHeight = 670;
-
     Image backgroungImg;
     Image mollaImg;
     Image thornLeftImg;
@@ -73,9 +72,9 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     Molla molla;
 
     int trunkVelocityX = -4; // move trunk to the left
-    int BatVelocityX = -7; // move trunk to the left
-    int velocityY = -10;
-    int gravity = 1;
+    int BatVelocityX = -8; // move bat to the left
+    int gravity = 1; // جاذبه بری پایین آوردن
+    int velocityY = -10; // ضد جاذبه بری بالا بردن
 
     ArrayList<Trunk> trunks;
     ArrayList<Bat> bats;
@@ -87,7 +86,10 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
 
     boolean gameOver = false;
     boolean flag = false;
+    int score = 0;
+    int bestScore;
 
+    // molla constructor
     MollaNasruddin() {
         setPreferredSize(new Dimension(boardWidth, boardHeight));
 
@@ -107,7 +109,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         molla = new Molla(mollaImg);
         // trunks
         trunks = new ArrayList<Trunk>();
-        // thorn
+        // bats
         bats = new ArrayList<Bat>();
 
         // place trunk timer
@@ -119,7 +121,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         });
         placeTrnukTimer.start();
 
-        // place thorn timer
+        // place bat timer
         placeBatTimer = new Timer(3000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -133,7 +135,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     }
 
     public void placeTrunk() {
-        int randomTrunky = (int) (Math.random() * 100);
+        int randomTrunky = (int) (Math.random() * 100) + 50;
 
         Trunk trunk = new Trunk(trunkImg);
         trunk.y -= randomTrunky;
@@ -158,32 +160,43 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     public void draw(Graphics g) {
         // background
         g.drawImage(backgroungImg, 0, 0, boardWidth, 700, null);
-        // thorn خار
+        // left thorn خارها سمت چپ
         g.drawImage(thornLeftImg, -50, 0, 100, boardHeight + 500, null);
         g.drawImage(thornLeftImg, -30, 0, 100, boardHeight + 475, null);
-        // molla
+        // molla ملا
         g.drawImage(molla.img, molla.x, molla.y, molla.width, molla.height, null);
-        // trunk
+        // trunk تنه درخت
         for (int i = 0; i < trunks.size(); i++) {
             Trunk trunk = trunks.get(i);
             g.drawImage(trunk.img, trunk.x, trunk.y, trunk.width, trunk.height, null);
         }
-        // thorn
+        // bat خفاش
         for (int i = 0; i < bats.size(); i++) {
             Bat bat = bats.get(i);
             g.drawImage(bat.img, bat.x, bat.y, bat.width, bat.height, null);
         }
 
+        if (gameOver) {
+            g.setColor(Color.red);
+            g.setFont(new Font("Arial", Font.BOLD, 50));
+            g.drawString("وی خداجو. تو که بُمُردی بچِم؟!", boardWidth / 2 - 270, 160);
+        } else {
+            g.setColor(Color.black);
+            g.setFont(new Font("Arial", Font.BOLD, 30));
+            g.drawString("امتیاز : " + String.valueOf(score), 50, 32);
+        }
+
     }
 
-    public void move() {
+    // for moving trunk and bat
+    public void moveObstakles() {
         velocityY += gravity;
         molla.y += velocityY;
 
         molla.y = Math.max(molla.y, 0);
         molla.y = Math.min(molla.y, 445);
 
-        // trunk and thorn
+        // trunk and bat
         for (int i = 0; i < (bats.size()); i++) {
 
             Trunk trunk = trunks.get(i);
@@ -191,6 +204,11 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
 
             Bat bat = bats.get(i);
             bat.x += BatVelocityX;
+
+            if (!trunk.passed && molla.x > trunk.x + trunk.width) {
+                trunk.passed = true;
+                score += 1;
+            }
 
             if (batCollision(molla, bat) || trunkCollision(molla, trunk)) {
                 gameOver = true;
@@ -201,13 +219,13 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         }
     }
 
-    // collision to the tree trunk
+    // collision to the bottom trunk
     public boolean trunkCollision(Molla molla, Trunk trunk) {
         return molla.x + 10 < trunk.width + trunk.x && molla.x + molla.width - 30 > trunk.x
                 && molla.y + 10 < trunk.height + trunk.y && molla.y + molla.height > trunk.y + 10;
     }
 
-    // collision to the bat
+    // collision to the top bat
     public boolean batCollision(Molla molla, Bat bat) {
         return molla.x + 80 < bat.width + bat.x && molla.x + molla.width - 100 > bat.x
                 && molla.y < bat.y + bat.height - 100 && molla.y + molla.height > bat.y - 50;
@@ -215,39 +233,109 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        move();
+        moveObstakles();
         repaint();
+        update();
+
+        // restart and close the game
         if (gameOver) {
             placeTrnukTimer.stop();
             placeBatTimer.stop();
             gameLoop.stop();
-            int response = JOptionPane.showConfirmDialog(null, "Score :  \nPlay Again?", "Ooops 🙄. Game Over!!!!!!!", JOptionPane.YES_NO_OPTION);
-            if (response == JOptionPane.YES_OPTION) {
-                // User clicked YES
+            if (score >= bestScore) {
+                bestScore = score;
+            }
+            // change button text to farsi
+            UIManager.put("OptionPane.yesButtonText", "دوباره بازی میکنیم");
+            UIManager.put("OptionPane.noButtonText", "بسه دیگه، مونده شدم");
+            // for changing text direction to farsi
+            JFrame frame = new JFrame();
+            frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+
+            int result = JOptionPane.showConfirmDialog(
+                    frame,
+                    "بهترین امتیاز : " + bestScore + " \nامتیاز تو : " + score,
+                    "خودی تو یکبار دیگه بازی نکنیم جوان؟؟",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (result == JOptionPane.YES_OPTION) {
+                System.out.println("User chose Yes");
+            } else if (result == JOptionPane.NO_OPTION) {
+                System.out.println("User chose No");
+            }
+
+            if (result == JOptionPane.YES_OPTION) {
+                // If User clicked YES reset the game conditions and variables
                 molla.y = mollaY;
                 molla.x = mollaX;
                 trunks.clear();
                 bats.clear();
+                score = 0;
                 gameOver = false;
+                tap3 = true;
+                isSpacePressed = false;
+                isRightArrowPressed = false;
+                isLeftArrowPressed = false;
+                isDownArrowPressed = false;
                 gameLoop.start();
                 placeBatTimer.start();
                 placeTrnukTimer.start();
-            }
-            else{
+            } else {
                 System.exit(0);
             }
-
 
         }
     }
 
     int tapCount = 0;
     boolean tap3 = true;
+    boolean isSpacePressed = false;
+    boolean isRightArrowPressed = false;
+    boolean isLeftArrowPressed = false;
+    boolean isDownArrowPressed = false;
 
+    // code for jumping 1 time whith simultaneously movement
     @Override
     public void keyPressed(KeyEvent e) {
-        if ((e.getKeyCode() == KeyEvent.VK_SPACE) && tap3) {
-            velocityY = -20; // up
+        int keyCode = e.getKeyCode();
+        if (keyCode == KeyEvent.VK_SPACE) {
+            isSpacePressed = true;
+        }
+        if (keyCode == KeyEvent.VK_RIGHT) {
+            isRightArrowPressed = true;
+        }
+        if (keyCode == KeyEvent.VK_DOWN) {
+            isDownArrowPressed = true;
+        }
+        if (keyCode == KeyEvent.VK_LEFT) {
+            isLeftArrowPressed = true;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        if (keyCode == KeyEvent.VK_SPACE) {
+            isSpacePressed = false;
+        }
+        if (keyCode == KeyEvent.VK_RIGHT) {
+            isRightArrowPressed = false;
+        }
+        if (keyCode == KeyEvent.VK_LEFT) {
+            isLeftArrowPressed = false;
+        }
+        if (keyCode == KeyEvent.VK_DOWN) {
+            isDownArrowPressed = false;
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    public void update() {
+        if (isSpacePressed && tap3) {
+            velocityY = -23;
             tapCount++;
             if (tapCount == 3) {
                 tap3 = false;
@@ -257,30 +345,50 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         if (molla.y >= 430) {
             tap3 = true;
         }
-        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            molla.y += 6; // down
+        if (isRightArrowPressed) {
+            molla.x += 10;
+            molla.x = Math.min(molla.x, 1000);
         }
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            molla.x += 12; // right
-            molla.x = Math.min(molla.x, 900);
+        if (isLeftArrowPressed) {
+            molla.x -= 10;
         }
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            molla.x -= 12; // left
+        if (isDownArrowPressed) {
+            molla.y += 7;
         }
-
-        // restart the game by pressing ENTER
-        // if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-        //     if (gameOver) {
-                
-        //     }
-        // }
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
-    }
+    // code for jumping no more 3 times and not simultaneously movement
 
-    @Override
-    public void keyReleased(KeyEvent e) {
-    }
+    // public void keyPressed(KeyEvent e) {
+    // if ((e.getKeyCode() == KeyEvent.VK_SPACE) && tap3) {
+    // velocityY = -20;
+    // tapCount++;
+    // if (tapCount == 3) {
+    // tap3 = false;
+    // tapCount = 0;
+    // }
+    // }
+    // if (molla.y >= 430) {
+    // tap3 = true;
+    // }
+    // if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+    // molla.y += 7;
+    // }
+
+    // if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+    // molla.x += 12;
+    // molla.x = Math.min(molla.x, 900);
+    // }
+    // if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+    // molla.x -= 12;
+    // }
+    // }
+
+    // @Override
+    // public void keyTyped(KeyEvent e) {
+    // }
+
+    // @Override
+    // public void keyReleased(KeyEvent e) {
+    // }
 }
