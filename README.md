@@ -11,3 +11,5 @@ App Features :
     2. The game is a simple game where the user has to pass the obstakles without collision.
     3. The game has a score board.
  -->
+![mollaGameSC2](https://github.com/user-attachments/assets/a1a06ccc-f597-4072-8d17-d71aafa7bb28)
+![mollaGameSC1](https://github.com/user-attachments/assets/e5cb1a39-19fd-4dda-afd8-fc9363a6ebd3)
