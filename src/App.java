@@ -4,7 +4,6 @@ public class App {
     public static void main(String[] args) throws Exception {
         int boardWidth = 1400;
         int boardHeight = 730;
-
         JFrame fream = new JFrame("ملا نصرالدین");
 
         fream.setSize(boardWidth, boardHeight);
@@ -18,6 +17,13 @@ public class App {
         // makes full screen up to header
         fream.pack();
         mollaNasruddin.requestFocus();
+        if (mollaNasruddin.gameOver == false) {
+            mollaNasruddin.playSound("bgMusic.wav");
+        }
+        if (mollaNasruddin.gameOver == true) {
+            mollaNasruddin.stopSound();
+
+        }
         fream.setVisible(true);
 
     }

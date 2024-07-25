@@ -1,7 +1,29 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 
 public class MollaNasruddin extends JPanel implements ActionListener, KeyListener {
@@ -12,6 +34,8 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     Image thornLeftImg;
     Image batImg;
     Image trunkImg;
+
+    Clip clip;
 
     // Molla
     int mollaX = 370;
@@ -130,7 +154,7 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         });
         placeBatTimer.start();
         // game timer
-        gameLoop = new Timer(1000 / 80, this);
+        gameLoop = new Timer(1000 / 180, this);
         gameLoop.start();
     }
 
@@ -184,8 +208,10 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
             g.setColor(Color.black);
             g.setFont(new Font("Arial", Font.BOLD, 30));
             g.drawString("امتیاز : " + String.valueOf(score), 50, 32);
+            g.setColor(Color.white);
+            g.setFont(new Font("Arial", Font.BOLD, 14));
+            g.drawString("Ehsan Nicksaresht", boardWidth - 150, boardHeight - 12);
         }
-
     }
 
     // for moving trunk and bat
@@ -205,11 +231,12 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
             Bat bat = bats.get(i);
             bat.x += BatVelocityX;
 
+            // updating score
             if (!trunk.passed && molla.x > trunk.x + trunk.width) {
                 trunk.passed = true;
                 score += 1;
             }
-
+            // if collision = true thene game over = true
             if (batCollision(molla, bat) || trunkCollision(molla, trunk)) {
                 gameOver = true;
             }
@@ -242,6 +269,17 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
             placeTrnukTimer.stop();
             placeBatTimer.stop();
             gameLoop.stop();
+
+            try {
+                File soundFile = new File("gameover.wav"); // Ensure this path is
+                AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioIn);
+                clip.start();
+            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException a) {
+                a.printStackTrace();
+            }
+
             if (score >= bestScore) {
                 bestScore = score;
             }
@@ -249,11 +287,11 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
             UIManager.put("OptionPane.yesButtonText", "دوباره بازی میکنم");
             UIManager.put("OptionPane.noButtonText", "بسه دیگه، مونده شدم");
             // for changing text direction to farsi
-            JFrame frame = new JFrame();
-            frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+            JPanel panel = new JPanel();
+            panel.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 
             int result = JOptionPane.showConfirmDialog(
-                    frame,
+                    panel,
                     "بهترین امتیاز : " + bestScore + " \nامتیاز تو : " + score,
                     "خودی تو یکبار دیگه بازی نکنیم جوان؟؟",
                     JOptionPane.YES_NO_OPTION);
@@ -294,20 +332,22 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
     boolean isLeftArrowPressed = false;
     boolean isDownArrowPressed = false;
 
-    // code for jumping 1 time whith simultaneously movement
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
         if (keyCode == KeyEvent.VK_SPACE) {
+            playSound("jumping.wav");
             isSpacePressed = true;
         }
         if (keyCode == KeyEvent.VK_RIGHT) {
+            playSound("run.wav");
             isRightArrowPressed = true;
         }
         if (keyCode == KeyEvent.VK_DOWN) {
             isDownArrowPressed = true;
         }
         if (keyCode == KeyEvent.VK_LEFT) {
+            playSound("run.wav");
             isLeftArrowPressed = true;
         }
     }
@@ -319,9 +359,11 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
             isSpacePressed = false;
         }
         if (keyCode == KeyEvent.VK_RIGHT) {
+            stopSound();
             isRightArrowPressed = false;
         }
         if (keyCode == KeyEvent.VK_LEFT) {
+            stopSound();
             isLeftArrowPressed = false;
         }
         if (keyCode == KeyEvent.VK_DOWN) {
@@ -331,6 +373,33 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
 
     @Override
     public void keyTyped(KeyEvent e) {
+    }
+
+    public void playSound(String soundFile) {
+        try {
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(getClass().getResource("/" + soundFile));
+            AudioFormat baseFormat = audioIn.getFormat();
+            AudioFormat decodedFormat = new AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED,
+                    baseFormat.getSampleRate(),
+                    16,
+                    baseFormat.getChannels(),
+                    baseFormat.getChannels() * 2,
+                    baseFormat.getSampleRate(),
+                    false);
+            AudioInputStream decodedAudioIn = AudioSystem.getAudioInputStream(decodedFormat, audioIn);
+            clip = AudioSystem.getClip();
+            clip.open(decodedAudioIn);
+            clip.start();
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stopSound() {
+        if (clip != null && clip.isRunning()) {
+            clip.stop();
+        }
     }
 
     public void update() {
@@ -351,44 +420,11 @@ public class MollaNasruddin extends JPanel implements ActionListener, KeyListene
         }
         if (isLeftArrowPressed) {
             molla.x -= 10;
+
         }
         if (isDownArrowPressed) {
             molla.y += 7;
         }
     }
 
-    // code for jumping no more 3 times and not simultaneously movement
-
-    // public void keyPressed(KeyEvent e) {
-    // if ((e.getKeyCode() == KeyEvent.VK_SPACE) && tap3) {
-    // velocityY = -20;
-    // tapCount++;
-    // if (tapCount == 3) {
-    // tap3 = false;
-    // tapCount = 0;
-    // }
-    // }
-    // if (molla.y >= 430) {
-    // tap3 = true;
-    // }
-    // if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-    // molla.y += 7;
-    // }
-
-    // if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-    // molla.x += 12;
-    // molla.x = Math.min(molla.x, 900);
-    // }
-    // if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-    // molla.x -= 12;
-    // }
-    // }
-
-    // @Override
-    // public void keyTyped(KeyEvent e) {
-    // }
-
-    // @Override
-    // public void keyReleased(KeyEvent e) {
-    // }
 }
