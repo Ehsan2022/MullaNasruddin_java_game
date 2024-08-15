@@ -14,7 +14,7 @@ public class App {
         MollaNasruddin mollaNasruddin = new MollaNasruddin();
         fream.add(mollaNasruddin);
 
-        // makes full screen up to header
+        // فول اسکرین تا هیدر
         fream.pack();
         mollaNasruddin.requestFocus();
         if (mollaNasruddin.gameOver == false) {
